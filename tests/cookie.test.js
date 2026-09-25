@@ -49,10 +49,7 @@ describe("cookie", () => {
         const url = "https://example.com/api/api_id/session_id/method";
 
         await cookie.set(url, "sessionId=38afes7a8");
-        await cookie.set(
-            url,
-            "id=a3fWa; Expires=Wed, 21 Oct 2015 07:28:00 GMT",
-        );
+        await cookie.set(url, "id=a3fWa; Expires=Wed, 21 Oct 2015 07:28:00 GMT");
         await cookie.set(url, "id=a3fWa; Max-Age=2592000");
         await cookie.set(url, "qwerty=219ffwef9w0f; Domain=some-company.co.uk");
         await cookie.set(url, "sessionId=e8bb43229de9; Domain=foo.example.com");
@@ -60,20 +57,12 @@ describe("cookie", () => {
         await cookie.set(url, "__Host-ID=123; Secure; Path=/");
         await cookie.set(url, "__Secure-id=1");
         await cookie.set(url, "__Host-id=1; Secure");
-        await cookie.set(
-            url,
-            "__Host-id=1; Secure; Path=/; Domain=example.com",
-        );
+        await cookie.set(url, "__Host-id=1; Secure; Path=/; Domain=example.com");
         await cookie.set(url, "__Http-ID=123; Secure; Domain=example.com");
         await cookie.set(url, "__Host-Http-ID=123; Secure; Path=/");
-        await cookie.set(
-            url,
-            "__Host-example=34d8g; SameSite=None; Secure; Path=/; Partitioned;",
-        );
+        await cookie.set(url, "__Host-example=34d8g; SameSite=None; Secure; Path=/; Partitioned;");
 
         const result = await cookie.get(url);
-        expect(result).toBe(
-            "sessionId=38afes7a8; id=a3fWa; __Secure-ID=123; __Host-ID=123; __Host-example=34d8g",
-        );
+        expect(result).toBe("sessionId=38afes7a8; id=a3fWa; __Secure-ID=123; __Host-ID=123; __Host-example=34d8g");
     });
 });

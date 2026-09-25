@@ -27,8 +27,7 @@ class Cookie {
         // - https://github.com/httpwg/http-extensions/pull/...
         // - Chrome 140 sudah implement, WebKit condong ke format ini
         "__Http-": (obj) => obj.secure && obj.httpOnly,
-        "__Host-Http-": (obj) =>
-            obj.secure && obj.httpOnly && !obj.domain && obj.path == "/",
+        "__Host-Http-": (obj) => obj.secure && obj.httpOnly && !obj.domain && obj.path == "/",
     };
 
     static attributesRegex = /([^=; ]+)(=([^;]+))?/g;
@@ -54,13 +53,7 @@ class Cookie {
     }
 
     async _ensureTable(db) {
-        const exists = await db
-            .query()
-            .select()
-            .from("sqlite_master")
-            .where("type", "table")
-            .where("name", this.tableName)
-            .exists();
+        const exists = await db.query().select().from("sqlite_master").where("type", "table").where("name", this.tableName).exists();
         if (exists) {
             return;
         }
@@ -78,19 +71,9 @@ class Cookie {
             table.column("path").text().notNull().default("/");
             table.column("sameSite").text().default("lax");
             table.column("secure").integer().default(0);
-            table
-                .column("created_at")
-                .integer()
-                .default(db.raw("(unixepoch('subsec') * 1000)"));
+            table.column("created_at").integer().default(db.raw("(unixepoch('subsec') * 1000)"));
 
-            table.primaryKey(
-                "api_id",
-                "session_id",
-                "hostname",
-                "domain",
-                "path",
-                "name",
-            );
+            table.primaryKey("api_id", "session_id", "hostname", "domain", "path", "name");
             table.index().on("expires");
             table.index().on("api_id", "session_id");
         });
@@ -134,47 +117,19 @@ class Cookie {
         options.api_id = this.apiId;
         options.session_id = this.sessionId;
 
-        return await this.db
-            .query()
-            .insert(this.tableName, options)
-            .onConflict(
-                "api_id",
-                "session_id",
-                "hostname",
-                "domain",
-                "path",
-                "name",
-            )
-            .doUpdate(
-                "value",
-                "expires",
-                "httpOnly",
-                "partitioned",
-                "sameSite",
-                "secure",
-            );
+        return await this.db.query().insert(this.tableName, options).onConflict("api_id", "session_id", "hostname", "domain", "path", "name").doUpdate("value", "expires", "httpOnly", "partitioned", "sameSite", "secure");
     }
 
     async clear() {
         if (this.ensureTable) await this._ensureTable(this.db);
 
-        return await this.db
-            .query()
-            .delete(this.tableName)
-            .where("api_id", this.apiId)
-            .where("session_id", this.sessionId);
+        return await this.db.query().delete(this.tableName).where("api_id", this.apiId).where("session_id", this.sessionId);
     }
 
     async deleteExpired() {
         if (this.ensureTable) await this._ensureTable(this.db);
 
-        return await this.db
-            .query()
-            .delete(this.tableName)
-            .where("api_id", this.apiId)
-            .where("session_id", this.sessionId)
-            .where("expires", "is not", null)
-            .where("expires", "<=", Date.now());
+        return await this.db.query().delete(this.tableName).where("api_id", this.apiId).where("session_id", this.sessionId).where("expires", "is not", null).where("expires", "<=", Date.now());
     }
 
     /**
@@ -239,9 +194,7 @@ class Cookie {
             .orderBy("LENGTH(path)", "DESC")
             .orderBy("created_at", "ASC");
 
-        return rows
-            .map(({ name, value }) => [name, value].join("="))
-            .join("; ");
+        return rows.map(({ name, value }) => [name, value].join("=")).join("; ");
     }
 
     /**
@@ -282,12 +235,7 @@ class Cookie {
             obj.hostname = hostname;
 
             if (!obj.path) {
-                obj.path =
-                    pathname
-                        .replace(/\/$/, "")
-                        .split("/")
-                        .slice(0, -1)
-                        .join("/") || "/";
+                obj.path = pathname.replace(/\/$/, "").split("/").slice(0, -1).join("/") || "/";
             }
 
             const prefix = obj.name.match(Cookie.prefixesRegex)?.[0];

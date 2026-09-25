@@ -28,15 +28,12 @@ const db = require("@ndiinginc/dal")(/* konfigurasi db */);
 
 const cookie = new Cookie(db, {
     tableName: "cookies", // opsional, default: "cookies"
-    apiId: "my-api",      // opsional, default: "default"
-    sessionId: "user-123",// opsional, default: "default"
+    apiId: "my-api", // opsional, default: "default"
+    sessionId: "user-123", // opsional, default: "default"
 });
 
 // Simpan cookie dari response header Set-Cookie
-await cookie.set(
-    "https://example.com/login",
-    "session=abc123; Path=/; HttpOnly; Secure; Max-Age=3600"
-);
+await cookie.set("https://example.com/login", "session=abc123; Path=/; HttpOnly; Secure; Max-Age=3600");
 
 // Ambil cookie header untuk request berikutnya
 const cookieHeader = await cookie.get("https://example.com/dashboard");
@@ -54,22 +51,19 @@ await cookie.clear();
 `set()` menerima string tunggal atau array string (misalnya dari header `Set-Cookie` yang berupa array):
 
 ```js
-await cookie.set(url, [
-    "a=1; Path=/",
-    "b=2; Path=/; Secure",
-]);
+await cookie.set(url, ["a=1; Path=/", "b=2; Path=/; Secure"]);
 ```
 
 ## API
 
 ### `new Cookie(db, options?)`
 
-| Parameter | Tipe | Default | Keterangan |
-|---|---|---|---|
-| `db` | `DAL` | — | Instance koneksi database dari `@ndiinginc/dal` |
-| `options.tableName` | `string` | `"cookies"` | Nama tabel penyimpanan cookie |
-| `options.apiId` | `string` | `"default"` | Namespace/ID API untuk isolasi data |
-| `options.sessionId` | `string` | `"default"` | ID sesi untuk isolasi data |
+| Parameter           | Tipe     | Default     | Keterangan                                      |
+| ------------------- | -------- | ----------- | ----------------------------------------------- |
+| `db`                | `DAL`    | —           | Instance koneksi database dari `@ndiinginc/dal` |
+| `options.tableName` | `string` | `"cookies"` | Nama tabel penyimpanan cookie                   |
+| `options.apiId`     | `string` | `"default"` | Namespace/ID API untuk isolasi data             |
+| `options.sessionId` | `string` | `"default"` | ID sesi untuk isolasi data                      |
 
 ### `cookie.set(url, str)`
 
@@ -94,21 +88,21 @@ Menghapus seluruh cookie untuk `apiId` + `sessionId` saat ini.
 
 Tabel dibuat otomatis (jika belum ada) dengan kolom berikut:
 
-| Kolom | Tipe | Keterangan |
-|---|---|---|
-| `api_id` | text | bagian dari primary key |
-| `session_id` | text | bagian dari primary key |
-| `hostname` | text | host asal cookie |
-| `name` | text | nama cookie |
-| `value` | text | nilai cookie |
-| `domain` | text | atribut `Domain` (default `""`) |
-| `expires` | integer | epoch ms, `null` jika session cookie |
-| `httpOnly` | integer | 0/1 |
-| `partitioned` | integer | 0/1 |
-| `path` | text | atribut `Path` (default `"/"`) |
-| `sameSite` | text | default `"lax"` |
-| `secure` | integer | 0/1 |
-| `created_at` | integer | epoch ms saat insert |
+| Kolom         | Tipe    | Keterangan                           |
+| ------------- | ------- | ------------------------------------ |
+| `api_id`      | text    | bagian dari primary key              |
+| `session_id`  | text    | bagian dari primary key              |
+| `hostname`    | text    | host asal cookie                     |
+| `name`        | text    | nama cookie                          |
+| `value`       | text    | nilai cookie                         |
+| `domain`      | text    | atribut `Domain` (default `""`)      |
+| `expires`     | integer | epoch ms, `null` jika session cookie |
+| `httpOnly`    | integer | 0/1                                  |
+| `partitioned` | integer | 0/1                                  |
+| `path`        | text    | atribut `Path` (default `"/"`)       |
+| `sameSite`    | text    | default `"lax"`                      |
+| `secure`      | integer | 0/1                                  |
+| `created_at`  | integer | epoch ms saat insert                 |
 
 Primary key: `(api_id, session_id, hostname, domain, path, name)`.
 
@@ -116,8 +110,8 @@ Primary key: `(api_id, session_id, hostname, domain, path, name)`.
 
 - `__Secure-` — wajib `Secure`
 - `__Host-` — wajib `Secure`, tanpa `Domain`, `Path=/`
-- `__Http-` *(draft)* — wajib `Secure` + `HttpOnly`
-- `__Host-Http-` *(draft)* — gabungan aturan `__Host-` dan `__Http-`
+- `__Http-` _(draft)_ — wajib `Secure` + `HttpOnly`
+- `__Host-Http-` _(draft)_ — gabungan aturan `__Host-` dan `__Http-`
 
 Cookie dengan prefix yang tidak memenuhi aturan di atas akan otomatis di-skip (tidak disimpan).
 
