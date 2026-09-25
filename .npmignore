@@ -4,3 +4,4 @@ tests/
 jest.config.js
 nodemon.json
 .prettierrc
+test.db
